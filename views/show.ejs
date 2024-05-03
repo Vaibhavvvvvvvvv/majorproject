@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wanderlust - Listing Details</title>
+    <!-- Include Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-4"> <!-- Bootstrap container for layout and spacing -->
+        <h1 class="mb-4">Listing Details</h1> <!-- Heading with bottom margin for spacing -->
+
+        <ul class="list-group"> <!-- Bootstrap list group for consistent styling -->
+            <li class="list-group-item">Title: <%= listing.title %></li> <!-- Add label for clarity -->
+            <li class="list-group-item">Description: <%= listing.description %></li> <!-- Use list-group-item for consistent styling -->
+            <li class="list-group-item">Price: ₹ <%= listing.price.toLocaleString("en-IN") %></li> <!-- Format with currency symbol -->
+            <li class="list-group-item">Location: <%= listing.location %></li>
+            <li class="list-group-item">Country: <%= listing.country %></li>
+        </ul>
+
+        <div class="mt-4"> <!-- Margin-top for spacing above edit and delete actions -->
+            <!-- Bootstrap button classes for consistent styling -->
+            <a href="/listings/<%= listing._id %>/edit" class="btn btn-secondary">Edit This Listing</a>
+
+            <!-- Form with method override to delete the listing -->
+            <form method="POST" action="/listings/<%= listing._id %>?_method=DELETE" class="d-inline"> <!-- Use inline display to keep buttons on the same line -->
+                <button type="submit" class="btn btn-danger">Delete</button> <!-- Bootstrap danger class for delete button -->
+            </form>
+        </div>
+    </div>
+
+    <!-- Include Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
