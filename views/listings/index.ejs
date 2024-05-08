@@ -1,0 +1,38 @@
+<% layout("/layouts/boilerplates") %>
+<body> 
+    <h1>All Listings</h1>
+    <div class="container mt-4">
+        <!-- Cards for listing content -->
+        <div class="row">
+            <% if (allList && allList.length > 0) { %>
+                <% for (let listing of allList) { %>
+                    <div class="col-md-4 mb-4">
+                        <a href="/listings/<%= listing._id %>" style="text-decoration: none;">
+                            <div class="card" style="border: none !important; margin-bottom: 2rem;">
+                                <img src="<%= listing.image %>" class="card-img-top" style="border-radius: 1rem; width: 100% !important; object-fit: cover !important; height: 20rem; position: relative;">
+                                <div class="card-img-overlay d-flex align-items-center justify-content-center" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(255, 255, 255, 0); transition: background-color 0.3s;">
+                                    <i class="fas fa-search" style="font-size: 3rem; opacity: 0; transition: opacity 0.3s;"></i>
+                                </div>
+                                <div class="card-body" style="padding: 0;">
+                                    <h5 class="card-title font-weight-bold"><%= listing.title %></h5>
+                                    <p class="card-text"><%= listing.price %> &#8377;</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                <% } %>
+            <% } else { %>
+                <div class="col">
+                    <p>No listings available</p>
+                </div>
+            <% } %>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <style>
+        .card:hover {
+            background-color: #f0f0f0; /* Gray color */
+        }
+    </style>
+</body>
