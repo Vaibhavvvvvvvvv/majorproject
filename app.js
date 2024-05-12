@@ -5,6 +5,8 @@ const Listing = require("./models/listing.js")
 const ejsMate = require("ejs-mate");
 const path = require("path"); // Corrected the `require` statement
 const methodOverride = require("method-override")
+const wrapAsync = require("./utils/wrapAsync.js");
+const ExpressError = require("./utils/ExpressError.js")
 
 app.set("view engine", "ejs"); // Ensure consistent spacing and syntax
 app.set("views", path.join(__dirname, "views")); // Corrected the code for setting views path
@@ -49,24 +51,35 @@ app.get("/listings", (req, res) => {
 app.get("/listings/new",(req,res)=>{
     res.render("listings/new.ejs")
 })
-//create route
-app.post("/listings",async(req,res)=>{
-    const newListing = new Listing(req.body.listing)
-    await newListing.save();
-    res.redirect("/listings")
-})
 
+//create route
+app.post("/listings", wrapAsync(async (req, res) => {
+    try{
+        if(!req.body.listing){
+            throw new ExpressError(400,"send valid data for listing")
+        }
+    const newListing = new Listing(req.body.listing);
+    await newListing.save();
+    res.redirect("/listings");
+}
+catch(err){
+   res.send("something went wrong")
+}
+}));
 
 //show route
-app.get("/listings/:id",async(req,res)=>{
+app.get("/listings/:id",wrapAsync(async(req,res)=>{
  let {id} = req.params
   const listing = await Listing.findById(id)
   res.render("listings/show.ejs",{listing})
-})
+}))
 
 //update&edit 
-app.get("/listings/:id/edit", async (req, res) => {
+app.get("/listings/:id/edit", wrapAsync(async (req, res) => {
     try {
+        if(!req.body.listing){
+            throw new ExpressError(400,"send valid data for listing")
+        }
         const { id } = req.params; // Extracts the ID from the URL
         const listing = await Listing.findById(id); // Finds the listing by ID
         if (!listing) {
@@ -78,9 +91,9 @@ app.get("/listings/:id/edit", async (req, res) => {
         console.error("Error fetching listing:", error); // Log the error for debugging
         res.status(500).send("Internal Server Error"); // Return 500 for server errors
     }
-});
+}));
 
-app.put("/listings/:id", async (req, res) => {
+app.put("/listings/:id", wrapAsync(async (req, res) => {
     try {
         const { id } = req.params; // Extracts the ID from the URL
         const updatedListing = await Listing.findByIdAndUpdate(
@@ -98,15 +111,15 @@ app.put("/listings/:id", async (req, res) => {
         console.error("Error updating listing:", error); // Log the error for debugging
         res.status(500).send("Internal Server Error"); // Return 500 for server errors
     }
-});
+}));
 
 //delete 
-app.delete('/listings/:id',async (req,res)=>{
+app.delete('/listings/:id',wrapAsync(async (req,res)=>{
     let {id} = req.params
     let deleted = await Listing.findByIdAndDelete(id)
     console.log(deleted)
     res.redirect('/listings');
-})
+}))
 
 
 
@@ -128,7 +141,15 @@ app.delete('/listings/:id',async (req,res)=>{
 //     res.send("success full testing")
 // })
 
+app.all("*",(req,res,next)=>{
+    next(new ExpressError(404,"Page not found"))
+})
 
+app.use((err, req, res, next) => { // Make sure `err` is the first parameter
+    let { status =500, message="somthing went wrong!" } = err;
+    res.render("err.ejs" ,{err})
+    // res.status(status).send(message);
+});
 
 app.listen(3000,()=>{
     console.log("app is listening")
