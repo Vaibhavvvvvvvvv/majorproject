@@ -7,7 +7,9 @@ const path = require("path"); // Corrected the `require` statement
 const methodOverride = require("method-override")
 const wrapAsync = require("./utils/wrapAsync.js");
 const ExpressError = require("./utils/ExpressError.js")
+const { listingSchema } = require('./schema.js');
 
+//middleware
 app.set("view engine", "ejs"); // Ensure consistent spacing and syntax
 app.set("views", path.join(__dirname, "views")); // Corrected the code for setting views path
 app.use(express.urlencoded({ extended: true })); // Corrected syntax
@@ -28,6 +30,17 @@ async function main(){
  await mongoose.connect(Mongo_url)
 }
 
+
+// server side validation middleware
+const validateListing = (req,res,next)=>{
+    let {error} = listingSchema.validate(req.body)
+    if(error){
+        let errMsg = error.details.map((el)=>el.message).join(",");
+        throw new ExpressError(400,errMsg)
+    }else{
+    next()
+}}
+
 //Route
 app.get('/',(req,res)=>{
     res.send("i am root")
@@ -47,24 +60,17 @@ app.get("/listings", (req, res) => {
         });
 });
 
-
+//new listings form
 app.get("/listings/new",(req,res)=>{
     res.render("listings/new.ejs")
 })
 
+
 //create route
-app.post("/listings", wrapAsync(async (req, res) => {
-    try{
-        if(!req.body.listing){
-            throw new ExpressError(400,"send valid data for listing")
-        }
+app.post("/listings",validateListing,wrapAsync(async (req, res) => {
     const newListing = new Listing(req.body.listing);
     await newListing.save();
     res.redirect("/listings");
-}
-catch(err){
-   res.send("something went wrong")
-}
 }));
 
 //show route
@@ -74,28 +80,21 @@ app.get("/listings/:id",wrapAsync(async(req,res)=>{
   res.render("listings/show.ejs",{listing})
 }))
 
-//update&edit 
+//edit 
 app.get("/listings/:id/edit", wrapAsync(async (req, res) => {
-    try {
-        if(!req.body.listing){
-            throw new ExpressError(400,"send valid data for listing")
-        }
-        const { id } = req.params; // Extracts the ID from the URL
-        const listing = await Listing.findById(id); // Finds the listing by ID
+        const { id } = req.params; 
+        const listing = await Listing.findById(id); 
         if (!listing) {
-            // If the listing doesn't exist, return a 404 status
             return res.status(404).send("Listing not found");
         }
-        res.render("listings/edit.ejs", { listing }); // Render the 'edit' view with the found listing
-    } catch (error) {
-        console.error("Error fetching listing:", error); // Log the error for debugging
-        res.status(500).send("Internal Server Error"); // Return 500 for server errors
-    }
+        res.render("listings/edit.ejs", { listing });
+        
 }));
 
-app.put("/listings/:id", wrapAsync(async (req, res) => {
-    try {
-        const { id } = req.params; // Extracts the ID from the URL
+
+//update 
+app.put("/listings/:id",validateListing,wrapAsync(async (req, res) => {  
+    const { id } = req.params; // Extracts the ID from the URL
         const updatedListing = await Listing.findByIdAndUpdate(
             id,
             { ...req.body }, // Use the full request body or req.body.listing based on your data structure
@@ -105,12 +104,8 @@ app.put("/listings/:id", wrapAsync(async (req, res) => {
             // If the listing doesn't exist, return a 404 status
             return res.status(404).send("Listing not found");
         }
-
         res.redirect("/listings"); // Redirects to the listing index after updating
-    } catch (error) {
-        console.error("Error updating listing:", error); // Log the error for debugging
-        res.status(500).send("Internal Server Error"); // Return 500 for server errors
-    }
+    
 }));
 
 //delete 
@@ -122,24 +117,6 @@ app.delete('/listings/:id',wrapAsync(async (req,res)=>{
 }))
 
 
-
-// app.get('/testlisting',(req,res)=>{
-//     let sample = new Listing({
-//         title : "my new villa",
-//         description:"by the beach",
-//         price : 3000,
-//         location : "calangute , goa",
-//         country : "India",
-//     })
-//     sample.save()
-//     .then((res)=>{
-//       console.log(res)
-//     })
-//     .catch((err)=>{
-//         console.log(err)
-//     })
-//     res.send("success full testing")
-// })
 
 app.all("*",(req,res,next)=>{
     next(new ExpressError(404,"Page not found"))
