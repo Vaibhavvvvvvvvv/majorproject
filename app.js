@@ -2,12 +2,16 @@ const express = require('express')
 const app = express()
 const mongoose = require('mongoose')
 const Listing = require("./models/listing.js")
+const Review = require("./models/review.js")
 const ejsMate = require("ejs-mate");
-const path = require("path"); // Corrected the `require` statement
+const path = require("path"); 
 const methodOverride = require("method-override")
 const wrapAsync = require("./utils/wrapAsync.js");
 const ExpressError = require("./utils/ExpressError.js")
-const { listingSchema } = require('./schema.js');
+const { listingSchema, reviewSchema} = require('./schema.js');
+
+
+
 
 //middleware
 app.set("view engine", "ejs"); // Ensure consistent spacing and syntax
@@ -40,6 +44,15 @@ const validateListing = (req,res,next)=>{
     }else{
     next()
 }}
+const validateReview = (req, res, next) => {
+    const { error } = reviewSchema.validate(req.body);
+    if (error) {
+        const errMsg = error.details.map(el => el.message).join(", ");
+        next(new ExpressError(400, errMsg));
+    } else {
+        next();
+    }
+};
 
 //Route
 app.get('/',(req,res)=>{
@@ -76,7 +89,7 @@ app.post("/listings",validateListing,wrapAsync(async (req, res) => {
 //show route
 app.get("/listings/:id",wrapAsync(async(req,res)=>{
  let {id} = req.params
-  const listing = await Listing.findById(id)
+  const listing = await Listing.findById(id).populate("reviews")
   res.render("listings/show.ejs",{listing})
 }))
 
@@ -116,7 +129,16 @@ app.delete('/listings/:id',wrapAsync(async (req,res)=>{
     res.redirect('/listings');
 }))
 
-
+//review
+//post route
+app.post("/listings/:id/reviews", validateReview, wrapAsync(async (req, res) => {
+    const listing = await Listing.findById(req.params.id);
+    const review = new Review(req.body.review);
+    listing.reviews.push(review);
+    await review.save();
+    await listing.save();
+    res.redirect(`/listings/${listing._id}`);
+}));
 
 app.all("*",(req,res,next)=>{
     next(new ExpressError(404,"Page not found"))
@@ -124,9 +146,10 @@ app.all("*",(req,res,next)=>{
 
 app.use((err, req, res, next) => { // Make sure `err` is the first parameter
     let { status =500, message="somthing went wrong!" } = err;
-    res.render("err.ejs" ,{err})
-    // res.status(status).send(message);
+    // res.render("err.ejs" ,{err})
+    res.status(status).send(message);
 });
+
 
 app.listen(3000,()=>{
     console.log("app is listening")
