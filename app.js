@@ -5,7 +5,8 @@ const ejsMate = require("ejs-mate");
 const path = require("path"); 
 const methodOverride = require("method-override")
 const ExpressError = require("./utils/ExpressError.js")
-
+const session = require("express-session")
+const flash = require("connect-flash")
 const listings = require("./routes/listing.js")
 const review = require("./routes/review.js")
 
@@ -32,10 +33,31 @@ async function main(){
 }
 
 
+//session,cookies and flash
+//session and cookies
+const sessionOption ={
+    secret : "tony_stark",
+    resave : false,
+    saveUninitialized : true,
+    cookie:{
+        expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days in milliseconds
+       httpOnly:true,
+    }
+}
+
+app.use(session(sessionOption))
+app.use(flash())
+app.use((req,res,next)=>{
+    res.locals.success=req.flash("success")
+    res.locals.error=req.flash("error")
+    next()
+})
 
 //Route
 app.use("/listings" , listings);
 app.use("/listings/:id/reviews" , review);
+
 
 app.get('/',(req,res)=>{
     res.send("i am root")

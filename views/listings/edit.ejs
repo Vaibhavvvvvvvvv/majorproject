@@ -2,6 +2,7 @@
 <body>
     <div class="container mt-4">
         <h1>Edit Listing</h1>
+        
         <!-- Edit form for an existing listing -->
         <!-- The 'action' URL should point to the appropriate route for updating a listing -->
         <form method="POST" action="/listings/<%= listing._id %>?_method=PUT" novalidate class="needs-validation"> <!-- Enables method override -->
