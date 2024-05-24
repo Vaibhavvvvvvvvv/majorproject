@@ -60,6 +60,21 @@
                         <a class="nav-link" href="/listings/new" style="color: #222222 !important;">Add new Listings</a>
                     </li>
                 </ul>
+                <ul class="navbar-nav ms-auto">
+                    <!-- Navigation Links -->
+                    <% if (!currentUser) { %>
+                        <li class="nav-item">
+                            <a class="nav-link" aria-current="page" href="/signup" style="color: #222222 !important;">Signup</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/login" style="color: #222222 !important;">Login</a>
+                        </li>
+                    <% } else { %>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/logout" style="color: #222222 !important;">Logout</a>
+                        </li>
+                    <% } %>
+                </ul>                
             </div>
         </div>
         
