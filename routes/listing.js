@@ -40,29 +40,29 @@ router.get("/new",isLoggedIn,(req,res)=>{
 //create route
 router.post("/",isLoggedIn,validateListing,wrapAsync(async (req, res) => {
     const newListing = new Listing(req.body.listing);
+    console.log(req.user)
+    newListing.owner = req.user._id;
     await newListing.save();
     req.flash("success","New listing Created")
     res.redirect("/listings");
 }));
 
 //show route
-router.get("/:id",wrapAsync(async(req,res)=>{
- let {id} = req.params
-  const listing = await Listing.findById(id).populate("reviews")
-  if(!listing){
-    req.flash("error","SORRY NO LIST FOUND")
-    res.redirect("/listings")
-  }
-  res.render("listings/show.ejs",{listing})
-}))
+// Show route
+router.get("/:id", wrapAsync(async (req, res) => {
+    const listing = await Listing.findById(req.params.id).populate('owner');
+    if (!listing) {
+        req.flash("error", "Listing not found");
+        return res.redirect("/listings");
+    }
+    res.render("listings/show", { listing });
+}));
+
 
 //edit 
 router.get("/:id/edit",isLoggedIn, wrapAsync(async (req, res) => {
         const { id } = req.params; 
         const listing = await Listing.findById(id); 
-        // if (!listing) {
-        //     return res.status(404).send("Listing not found");
-        // }
         if(!listing){
             req.flash("error","SORRY NO LIST FOUND")
             res.redirect("/listings")

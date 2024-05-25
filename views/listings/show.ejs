@@ -15,23 +15,26 @@
     
                     <ul class="list-group"> <!-- Bootstrap list group for consistent styling -->
                         <!-- <li class="list-group-item">Title: </li> Add label for clarity -->
+                        <i><li class="list-group-item">Owner: <%= listing.owner.username %></li></i>
                         <li class="list-group-item">Description: <%= listing.description %></li> <!-- Use list-group-item for consistent styling -->
-                        <li class="list-group-item">Price: ₹ <%= listing.price.toLocaleString("en-IN") %></li> <!-- Format with currency symbol -->
+                        <li class="list-group-item">Price: ₹  <%= listing.price.toLocaleString("en-IN") %>/night</li> <!-- Format with currency symbol -->
                         <li class="list-group-item">Location: <%= listing.location %></li>
                         <li class="list-group-item">Country: <%= listing.country %></li>
                     </ul>
                 </div>
             </div>
         </div>
-        <div class="row justify-content-center mt-4"> <!-- Center the edit and delete actions -->
-            <div class="col-md-6 text-center"> <!-- Use medium-sized column for better layout -->
-                <!-- Bootstrap button classes for consistent styling -->
-                <a href="/listings/<%= listing._id %>/edit" class="btn btn-secondary">Edit This Listing</a>
 
-                <!-- Form with method override to delete the listing -->
-                <form method="POST" action="/listings/<%= listing._id %>?_method=DELETE" class="d-inline"> <!-- Use inline display to keep buttons on the same line -->
-                    <button type="submit" class="btn btn-danger">Delete</button> <!-- Bootstrap danger class for delete button -->
+        <div class="row justify-content-center mt-4"> 
+            <div class="col-md-6 text-center">
+                <% if(currentUser && currentUser._id.equals(listing.owner._id)){%>
+                <div class="btns"> 
+                <a href="/listings/<%= listing._id %>/edit" class="btn btn-secondary">Edit This Listing</a>
+                <form method="POST" action="/listings/<%= listing._id %>?_method=DELETE" class="d-inline"> 
+                    <button type="submit" class="btn btn-danger">Delete</button> 
                 </form>
+            </div>
+            <%}%>
             </div>
             
             <div class="col-8 offset-2">

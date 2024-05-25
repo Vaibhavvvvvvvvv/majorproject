@@ -26,7 +26,7 @@ router.post("/", validateReview, wrapAsync(async (req, res) => {
     listing.reviews.push(review);
     await review.save();
     await listing.save();
-    req.flash("success","REVIEW DELETED")
+    req.flash("success","REVIEW SUBMMITED")
     res.redirect(`/listings/${listing._id}`);
 }));
 
