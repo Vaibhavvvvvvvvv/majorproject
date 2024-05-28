@@ -3,7 +3,7 @@
     <div class="container mt-4">
         <h1>Create New Listing</h1>
         <!-- Form to create a new listing -->
-        <form action="/listings" method="POST" novalidate class="needs-validation">
+        <form action="/listings" method="POST" novalidate class="needs-validation" enctype="multipart/form-data">
             <!-- Title -->
             <div class="form-group">
                 <label for="title">Title</label>
@@ -30,8 +30,8 @@
 
             <!-- Image URL -->
             <div class="form-group">
-                <label for="image">Image URL</label>
-                <input type="url" class="form-control" id="image" name="listing[image]" placeholder="Enter an image URL">
+                <label for="image">Upload image</label>
+                <input type="file" class="form-control" id="image" name="listing[image]" placeholder="Enter an image URL">
             </div>
 
             <!-- Price -->

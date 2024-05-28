@@ -10,8 +10,8 @@ const listingSchema = new Schema({
     },
     description: String,
     image: {
-        type: String,
-        default: "https://img0.etsystatic.com/104/0/9318045/il_fullxfull.1016506326_sbt3.jpg",
+        url: String,
+        filename: String,
     },
     price: {
         type: Number,
