@@ -51,24 +51,31 @@ module.exports.editRoute = async (req, res) => {
         req.flash("error","SORRY NO LIST FOUND")
         res.redirect("/listings")
       } 
-    res.render("listings/edit.ejs", { listing });
-    
+      let originalImageUrl = listing.image.url;
+      originalImageUrl = originalImageUrl.replace("/upload","/upload/h_300,w_250")
+      res.render("listings/edit.ejs", { listing,originalImageUrl });
 }
 
 
 module.exports.updateRoute = async (req, res) => {  
-    const { id } = req.params; // Extracts the ID from the URL
-    const updatedListing = await Listing.findByIdAndUpdate(id,
-            { ...req.body.listing }, // Use the full request body or req.body.listing based on your data structure
-            { new: true, runValidators: true } // Return the updated document and validate
-        );
-        if (!updatedListing) {
-            // If the listing doesn't exist, return a 404 status
-            return res.status(404).send("Listing not found");
-        }
-        req.flash("success","Modified")
-        res.redirect(`/listings/${id}`); // Redirects to the listing index after updating
-    
+    const { id } = req.params;
+    let listing = await Listing.findByIdAndUpdate(id, {...req.body.listing})
+    if(typeof req.file !=="undefined"){
+        let url = req.file.path;
+        let filename = req.file.filename;
+        listing.image={url,filename}
+        await listing.save()
+    }
+    req.flash("success","Modified")
+    res.redirect(`/listings/${id}`); // Redirects to the listing index after updating
+    // const updatedListing = await Listing.findByIdAndUpdate(id,
+    //         { ...req.body.listing }, 
+    //         { new: true, runValidators: true }
+    //     );
+    //     if (!updatedListing) {
+    //         return res.status(404).send("Listing not found");
+    //     }
+       
 }
 
 
