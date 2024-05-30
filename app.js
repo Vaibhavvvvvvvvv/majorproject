@@ -6,29 +6,49 @@ console.log(process.env.SECRET)
 const express = require('express');
 const app = express();
 const mongoose = require('mongoose');
+const dbUrl = process.env.ATLAS_URL
 const ejsMate = require("ejs-mate");
 const path = require("path");
 const methodOverride = require("method-override");
 const ExpressError = require("./utils/ExpressError");
 const session = require("express-session");
+const MongoStore = require('connect-mongo');
 const flash = require("connect-flash");
 const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
 const User = require("./models/user");
 
 // Mongo connection
-mongoose.connect('mongodb://127.0.0.1:27017/wanderlust', {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-}).then(() => {
-    console.log("MongoDB connection successful");
-}).catch(err => {
-    console.log(err);
-});
+async function main() {
+    await mongoose.connect(dbUrl, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true
+    });
+}
 
-// Session and flash configuration
+main()
+    .then(() => {
+        console.log("MongoDB connection successful");
+    })
+    .catch((err) => {
+        console.error("MongoDB connection error: ", err);
+    });
+
+    const store = MongoStore.create({
+        mongoUrl: dbUrl,
+        crypto :{
+            secret: process.env.SECRET
+        },
+        touchAfter: 24 * 3600,
+      })
+      store.on("error",()=>{
+        console.log("error in mongo session store",err)
+      })
+
+    // Session and flash configuration
 const sessionOption = {
-    secret: "tony_stark",
+    store,
+    secret: process.env.SECRET,
     resave: false,
     saveUninitialized: true,
     cookie: {
@@ -79,9 +99,11 @@ app.use("/listings", listings);
 app.use("/listings/:id/reviews", reviews);
 app.use("/", users);
 
-app.get('/', (req, res) => {
-    res.send("I am root");
-});
+// app.get('/', (req, res) => {
+//     res.send("I am root");
+// });
+
+
 
 app.all("*", (req, res, next) => {
     next(new ExpressError(404, "Page not found"));

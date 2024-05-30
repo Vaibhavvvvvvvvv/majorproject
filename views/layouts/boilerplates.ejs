@@ -37,7 +37,7 @@
         style="height: 3rem; background-color: white;"> <!-- Changed height to 3rem -->
         <div class="container-fluid">
             <!-- Navbar Brand -->
-            <a class="navbar-brand" href="/" style="color: red; font-size: 1.5rem;"><i
+            <a class="navbar-brand" href="/listings" style="color: red; font-size: 1.5rem;"><i
                     class="fa-regular fa-compass"></i></a> <!-- Adjusted font-size -->
 
             <!-- Toggle for Mobile View -->
@@ -51,27 +51,24 @@
                 <ul class="navbar-nav me-auto">
                     <!-- Navigation Links -->
                     <li class="nav-item">
-                        <a class="nav-link" aria-current="page" href="/" style="color: #222222 !important;">Home</a>
+                        <a class="nav-link" href="/listings" style="color: #222222 !important;">Explore</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/listings" style="color: #222222 !important;">Listings</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/listings/new" style="color: #222222 !important;">Add new Listings</a>
+                        
                     </li>
                 </ul>
                 <ul class="navbar-nav ms-auto">
-                    <!-- Navigation Links -->
+                    <a class="nav-link" href="/listings/new" style="color: #222222 !important;">Airbnb your home</a>
                     <% if (!currentUser) { %>
                         <li class="nav-item">
-                            <a class="nav-link" aria-current="page" href="/signup" style="color: #222222 !important;">Signup</a>
+                            <a class="nav-link" aria-current="page" href="/signup" style="color: #222222 !important;"><b>Signup</b></a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="/login" style="color: #222222 !important;">Login</a>
+                            <a class="nav-link" href="/login" style="color: #222222 !important;"><b>Login</b></a>
                         </li>
                     <% } else { %>
                         <li class="nav-item">
-                            <a class="nav-link" href="/logout" style="color: #222222 !important;">Logout</a>
+                            <a class="nav-link" href="/logout" style="color: #222222 !important;"><b>Logout</b></a>
                         </li>
                     <% } %>
                 </ul>                
