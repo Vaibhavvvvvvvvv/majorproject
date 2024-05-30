@@ -10,7 +10,7 @@ const dbUrl = process.env.ATLAS_URL
 const ejsMate = require("ejs-mate");
 const path = require("path");
 const methodOverride = require("method-override");
-const ExpressError = require("./utils/ExpressError");
+// const ExpressError = require("./utils/ExpressError");
 const session = require("express-session");
 const MongoStore = require('connect-mongo');
 const flash = require("connect-flash");
@@ -99,20 +99,20 @@ app.use("/listings", listings);
 app.use("/listings/:id/reviews", reviews);
 app.use("/", users);
 
-// app.get('/', (req, res) => {
-//     res.send("I am root");
+app.get('/', (req, res) => {
+    res.redirect("/listings");
+});
+
+
+
+// app.all("*", (req, res, next) => {
+//     next(new ExpressError(404, "Page not found"));
 // });
 
-
-
-app.all("*", (req, res, next) => {
-    next(new ExpressError(404, "Page not found"));
-});
-
-app.use((err, req, res, next) => {
-    const { status = 500, message = "Something went wrong!" } = err;
-    res.status(status).send(message);
-});
+// app.use((err, req, res, next) => {
+//     const { status = 500, message = "Something went wrong!" } = err;
+//     res.status(status).send(message);
+// });
 
 app.listen(3000, () => {
     console.log("App is listening on port 3000");
